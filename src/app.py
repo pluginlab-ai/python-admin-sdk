@@ -3,14 +3,11 @@ from typing import TypedDict, Optional
 from auth import PluginlabAuth
 from dataclasses import dataclass
 
-class PluginlabAppConfig(TypedDict):
-    secret_key: str
-    plugin_id: str
-    auth_cert_url: Optional[str]
-    auth_url: Optional[str]
 
-@dataclass
+
 class PluginlabApp:
+
+
     def __init__(
             self,
             secret_key: str,
@@ -24,7 +21,10 @@ class PluginlabApp:
         self.auth_cert_url = auth_cert_url
 
         s = requests.Session()
-        s.headers.update()
+        s.headers.update({
+            'X-PluginLab-Admin-Secret': self.secret_key,
+            'X-PluginLab-Plugin-Id': self.plugin_id
+        })
         self.client = s
 
     def get_auth(self):
