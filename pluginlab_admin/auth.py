@@ -2,7 +2,7 @@ from typing import Any, Optional, Generic, TypeVar
 from dataclasses import dataclass
 from enum import Enum
 import json
-from token_verifier import TokenVerifier
+from .token_verifier import TokenVerifier
 import requests
 
 class SignInMethodId(Enum):
@@ -38,7 +38,7 @@ class PaginatedResponse(Generic[T]):
     total: int
     next_page_cursor: Optional[str]
 
-class PluginlabAuth:
+class AppAuth:
     def __init__(self, plugin_id: str, secret_key: str, auth_url: str, auth_cert_url: str): 
         self.plugin_id = plugin_id
         self.secret_key = secret_key

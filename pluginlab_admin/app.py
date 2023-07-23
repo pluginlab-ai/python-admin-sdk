@@ -1,13 +1,7 @@
 import requests
-from typing import TypedDict, Optional
-from auth import PluginlabAuth
-from dataclasses import dataclass
+from .auth import AppAuth
 
-
-
-class PluginlabApp:
-
-
+class App:
     def __init__(
             self,
             secret_key: str,
@@ -28,7 +22,7 @@ class PluginlabApp:
         self.client = s
 
     def get_auth(self):
-        auth = PluginlabAuth(
+        auth = AppAuth(
                 plugin_id=self.plugin_id,
                 secret_key=self.secret_key,
                 auth_url=self.auth_url,
@@ -36,6 +30,3 @@ class PluginlabApp:
                 )
 
         return auth
-
-    def verify_token(self):
-        return ""
