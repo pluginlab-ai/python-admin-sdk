@@ -1,15 +1,21 @@
-from typing import Optional, Generic, TypeVar
+from typing import Any, Optional, Generic, TypeVar
 from dataclasses import dataclass
+from enum import Enum
 import json
 from token_verifier import TokenVerifier
 import requests
+
+class SignInMethodId(Enum):
+    EMAIL_AND_PASSWORD = 'email-and-password'
+    MAGIC_EMAIL_CODE = 'magic-email-code'
+    GOOGLE = 'google'
 
 @dataclass
 class MemberAuth:
     is_verified: bool;
     email: str;
     has_password: bool;
-    sign_in_method: str;
+    sign_in_method: SignInMethodId;
 
 @dataclass
 class Member:
@@ -131,4 +137,68 @@ class PluginlabAuth:
 
         return paginated_res
 
-    
+    def create_member(self, email: str, password: str, is_verified: Optional[bool] = None, metadata: Optional[dict[str, str]] = None):
+        url = self._make_api_url('/members')
+        data: dict[str, Any] = {
+            'email': email,
+            'password': password,
+        }
+
+        if is_verified is not None:
+            data['isVerified'] = is_verified
+        if metadata is not None:
+            data['metadata'] = metadata
+
+        res = self.client.post(url, json=data)
+
+        if res.status_code != 201:
+            error_data = str(res.content)
+            raise Exception(f'An unknown error occured: {error_data}')
+
+        raw_member = json.loads(res.content)
+        member = self._transform_raw_member(raw_member)
+
+        return member
+
+    def update_member(
+            self,
+            id: str,
+            name: Optional[str] = None,
+            given_name: Optional[str] = None,
+            family_name: Optional[str] = None,
+            picture_url: Optional[str] = None,
+            metadata: Optional[dict[str, str]] = None,
+            ) -> Member:
+        url = self._make_api_url(f'/members/{id}')
+        data: dict[str, Any] = {}
+
+        if name is not None:
+            data['name'] = name
+        if given_name is not None:
+            data['givenName'] = given_name
+        if family_name is not None:
+            data['familyName'] = family_name
+        if picture_url is not None:
+            data['pictureUrl'] = picture_url
+        if metadata is not None:
+            data['metadata'] = metadata
+
+        res = self.client.patch(url, json=data)
+
+        if not res.ok:
+            error_data = str(res.content)
+            raise Exception(f'An error occured: {error_data}')
+
+        raw_member = json.loads(res.content)
+        member = self._transform_raw_member(raw_member)
+
+        return member
+
+
+    def delete_member(self, id: str) -> None:
+        url = self._make_api_url(f'/members/{id}')
+        res = self.client.delete(url)
+
+        if not res.ok:
+            error_data = str(res.content)
+            raise Exception(f'An unknown error occured: {error_data}')
