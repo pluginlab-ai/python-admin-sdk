@@ -1,2 +1,2 @@
 from .app import App
-from .webhook import Webhook
+from .webhook import Webhook, WebhookHeaders
