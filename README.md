@@ -37,9 +37,41 @@ token = "eyJhbGc...dQssw5c"
 
 try:
     payload = auth.verify_token(token)
+    # from that point we know the information in the token hasn't been tampered with
+
+    # we could, for instance, check if the user has a given plan and take specific action based on that
+    premium_plan_id = 'KWsmKyJnHBF2Dz1mETDF';
+    plan_id = payload.user.plan_id;
+
+    if plan_id:
+        if plan_id == premium_plan_id: 
+            do_something_special()
+        else
+            do_other_stuff()
+
     print(payload.uid)
 except Exception as e:
     print(f"An error occurred while verifying the token: {e}")
+```
+
+The verified token payload is represented by the following typings:
+
+```python
+class TokenPayloadUser:
+    id: str
+    email: str
+    name: Optional[str] = None
+    given_name: Optional[str] = None
+    plan_id: Optional[str] = None
+    price_id: Optional[str] = None
+
+class TokenPayload:
+    uid: str
+    iss: str
+    aud: str
+    iat: int
+    exp: int
+    user: TokenPayloadUser
 ```
 
 ## Get a member by id or email
