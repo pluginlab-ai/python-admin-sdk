@@ -30,7 +30,7 @@ Everytime ChatGPT will talk to your backend through the PluginLab proxy, it will
 You can verify the integrity of such token by using the `verify_token` method:
 
 ```python
-auth = app.get_auth();
+auth = app.get_auth()
 
 # usually you'd get the token from the Authorization header of the HTTP request, formatted as `Bearer <token>`
 token = "eyJhbGc...dQssw5c"
@@ -40,8 +40,8 @@ try:
     # from that point we know the information in the token hasn't been tampered with
 
     # we could, for instance, check if the user has a given plan and take specific action based on that
-    premium_plan_id = 'KWsmKyJnHBF2Dz1mETDF';
-    plan_id = payload.user.plan_id;
+    premium_plan_id = 'KWsmKyJnHBF2Dz1mETDF'
+    plan_id = payload.user.plan_id
 
     if plan_id:
         if plan_id == premium_plan_id: 
@@ -144,7 +144,7 @@ You can request up to 100 members at a time and get a specific page by providing
 
 ```python
 paginated_result1 = auth.get_members(50)
-cursor = paginated_result1.next_page_cursor;
+cursor = paginated_result1.next_page_cursor
 
 if not cursor is None:
     paginated_result2 = auth.get_members(50, cursor)
