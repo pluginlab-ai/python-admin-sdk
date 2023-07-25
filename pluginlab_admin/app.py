@@ -6,7 +6,7 @@ class App:
             self,
             secret_key: str,
             plugin_id: str,
-            auth_url = "https://auth.pluginlab.ai/admin/v1/cert",
+            auth_url = "https://auth.pluginlab.ai",
             auth_cert_url = "https://auth.pluginlab.ai/admin/v1/cert"
         ):
         self.plugin_id = plugin_id

@@ -208,7 +208,7 @@ webhook = Webhook(webhook_secret)
 
 @app.route('/webhook', methods=['POST'])
 def api():
-    sig = request.headers.get(WebhookHeaders.Signature)
+    sig = request.headers.get(WebhookHeaders.Signature.value)
     raw_body = request.get_data(as_text=True)
 
     if not sig:
