@@ -220,3 +220,45 @@ def api():
     // process the payload as you like
 ```
 Make sure you are providing the `is_signature_valid` method with the raw body of the request, as it was originally sent.
+
+## Events
+
+On PluginLab, an event is used as a representaiton of a plugin request and is traditionally generated on each request made by ChatGPT.
+The SDK offers limited but useful utilities to deal with events.
+
+To get started, you need to leverage the event service by calling the `app.get_event` method.
+
+```typescript
+// assuming app was previously initialized as showed above
+event = app.get_event();
+```
+
+### Create a custom event
+
+If you want to create custom events that will appear in your PluginLab dashboard and count as part of your users' quota, you can rely on the `create_custom` method.
+
+
+This is especially useful if your service is accessible from other means that ChatGPT but you still want to account for usage using PluginLab.
+
+
+```python
+from pluginlab_admin import EventLocation
+
+location = EventLocation(
+    country_code="US",
+    subdivision_code="CA", # optional
+)
+
+event.create_custom(
+    # case insensitive, max. 10 chars
+    event_source="WEB_UI",
+    # optional, quota ignored if not present
+    member_id="mem_fd9a1ba5e385e3d97412cdfbd7b8284c4f0c8e18",
+    # optional
+    location=location,
+    # optional, defaults to true
+    is_in_quota=True
+)
+```
+
+Assuming the provided `member_id` refers to a valid plugin member then a new event will get created once the above code runs. It will appear in your PluginLab dashboard's event section.
