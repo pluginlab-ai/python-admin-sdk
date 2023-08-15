@@ -127,6 +127,38 @@ class Member:
     updated_at_ms: int;
 ```
 
+### Get member identities
+
+Once a user logs in to your PluginLab portal using a third-party authentication provider, they get assigned an identity for that specific provider.
+An identity might contain what you need to interact with the service on behalf of your user such as an access token or a refresh token.
+To retrieve all the identities for a given user, use the `auth.get_member_identities` method:
+
+```python
+identities = auth.get_member_identities("mem_66c72702dfd9c9a34e80cae434a4bf7e6d3d37df")
+
+if identities.google is not None:
+    print("Google identity found, access token is ", identities.google.access_token)
+
+if identities.github is not None:
+    # do your stuff
+
+# This applies to every third-party auth provider supported by PluginLab although each might give or not give some information.
+```
+
+Here is the class used to represent an identity:
+
+```python
+@dataclass
+class IdentityProviderData:
+    provider: str;
+    provider_user_id: str;
+    access_token_expires_at_ms: int | None;
+    refresh_token_expires_at_ms: int | None;
+    last_used_at_ms: int | None;
+    access_token: str | None;
+    refresh_token: str | None;
+```
+
 ## List members
 
 ### Basic

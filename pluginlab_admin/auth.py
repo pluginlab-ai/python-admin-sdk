@@ -9,6 +9,19 @@ class SignInMethodId(Enum):
     EMAIL_AND_PASSWORD = 'email-and-password'
     MAGIC_EMAIL_CODE = 'magic-email-code'
     GOOGLE = 'google'
+    GITHUB = 'github'
+    GITLAB = 'gitlab'
+    MICROSOFT = 'microsoft'
+
+@dataclass
+class IdentityProviderData:
+    provider: str;
+    access_token_expires_at_ms: int | None;
+    refresh_token_expires_at_ms: int | None;
+    last_used_at_ms: int | None;
+    access_token: str | None;
+    provider_user_id: str;
+    refresh_token: str | None;
 
 @dataclass
 class MemberAuth:
@@ -16,6 +29,13 @@ class MemberAuth:
     email: str;
     has_password: bool;
     sign_in_method: SignInMethodId;
+
+@dataclass
+class Identities:
+    github: IdentityProviderData | None;
+    gitlab: IdentityProviderData | None;
+    google: IdentityProviderData | None;
+    microsoft: IdentityProviderData | None;
 
 @dataclass
 class Member:
@@ -81,6 +101,17 @@ class AppAuth:
             created_at_ms=json['createdAtMs'],
             updated_at_ms=json['updatedAtMs']
         )
+
+    def transform_raw_identity_provider_data(self, json: dict) -> IdentityProviderData:
+        return IdentityProviderData(
+            provider=json['provider'],
+            provider_user_id=json['providerUserId'],
+            access_token_expires_at_ms=json.get('accessTokenExpiresAtMs', None),
+            refresh_token_expires_at_ms=json.get('refreshTokenExpiresAtMs', None),
+            last_used_at_ms=json.get('lastUsedAtMs', None),
+            access_token=json.get('accessToken', None),
+            refresh_token=json.get('refreshToken', None)
+        )
         
     def verify_token(self, token: str):
         return self.token_verifier.verify_token(token)
@@ -136,6 +167,29 @@ class AppAuth:
         )
 
         return paginated_res
+
+    def get_member_identities(self, id: str) -> Identities:
+        url = self._make_api_url(f'/members/{id}/identities')
+        res = self.client.get(url)
+
+        if res.status_code != 200:
+            error_data = str(res.content)
+            raise Exception(f'An unknown error occured: {error_data}')
+
+        j = json.loads(res.content)
+        github = j.get('github', None)
+        gitlab = j.get('gitlab', None)
+        google = j.get('google', None)
+        microsoft = j.get('microsoft', None)
+
+        identities = Identities(
+            github=github and self.transform_raw_identity_provider_data(github),
+            gitlab=gitlab and self.transform_raw_identity_provider_data(gitlab),
+            google=google and self.transform_raw_identity_provider_data(google),
+            microsoft=microsoft and self.transform_raw_identity_provider_data(microsoft)
+        )
+
+        return identities
 
     def create_member(self, email: str, password: str, is_verified: Optional[bool] = None, metadata: Optional[dict[str, str]] = None):
         url = self._make_api_url('/members')
