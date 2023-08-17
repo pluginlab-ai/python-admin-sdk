@@ -59,7 +59,7 @@ class PaginatedResponse(Generic[T]):
     next_page_cursor: Optional[str]
 
 class AppAuth:
-    def __init__(self, plugin_id: str, secret_key: str, auth_url: str, auth_cert_url: str): 
+    def __init__(self, plugin_id: str, secret_key: str, auth_url: str, auth_cert_url: str):
         self.plugin_id = plugin_id
         self.secret_key = secret_key
         self.auth_url = auth_url
@@ -112,7 +112,7 @@ class AppAuth:
             access_token=json.get('accessToken', None),
             refresh_token=json.get('refreshToken', None)
         )
-        
+
     def verify_token(self, token: str):
         return self.token_verifier.verify_token(token)
 
@@ -125,7 +125,7 @@ class AppAuth:
 
         if res.status_code != 200:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')
 
         raw_member = json.loads(res.content)
         member = self._transform_raw_member(raw_member)
@@ -141,7 +141,7 @@ class AppAuth:
 
         if res.status_code != 200:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')
 
         raw_member = json.loads(res.content)
         member = self._transform_raw_member(raw_member)
@@ -154,7 +154,7 @@ class AppAuth:
 
         if res.status_code != 200:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')
 
         j = json.loads(res.content)
 
@@ -174,7 +174,7 @@ class AppAuth:
 
         if res.status_code != 200:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')
 
         j = json.loads(res.content)
         github = j.get('github', None)
@@ -190,6 +190,19 @@ class AppAuth:
         )
 
         return identities
+
+    def refresh_member_identity_token(self, member_id: str, identity_id: str) -> IdentityProviderData:
+        url = self._make_api_url(f'/members/{member_id}/identities/{identity_id}/refresh')
+        res = self.client.post(url)
+
+        if res.status_code != 200:
+            error_data = str(res.content)
+            raise Exception(f'An error occurred: {error_data}')
+
+        j = json.loads(res.content)
+        identity = self.transform_raw_identity_provider_data(github),
+
+        return identity
 
     def create_member(self, email: str, password: str, is_verified: Optional[bool] = None, metadata: Optional[dict[str, str]] = None):
         url = self._make_api_url('/members')
@@ -207,7 +220,7 @@ class AppAuth:
 
         if res.status_code != 201:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')
 
         raw_member = json.loads(res.content)
         member = self._transform_raw_member(raw_member)
@@ -241,7 +254,7 @@ class AppAuth:
 
         if not res.ok:
             error_data = str(res.content)
-            raise Exception(f'An error occured: {error_data}')
+            raise Exception(f'An error occurred: {error_data}')
 
         raw_member = json.loads(res.content)
         member = self._transform_raw_member(raw_member)
@@ -255,4 +268,4 @@ class AppAuth:
 
         if not res.ok:
             error_data = str(res.content)
-            raise Exception(f'An unknown error occured: {error_data}')
+            raise Exception(f'An unknown error occurred: {error_data}')

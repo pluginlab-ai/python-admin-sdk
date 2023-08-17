@@ -159,6 +159,40 @@ class IdentityProviderData:
     refresh_token: str | None;
 ```
 
+
+### Refresh identity access token
+
+For OAuth providers such as Google or Gitlab the access token has a limited lifetime. PluginLab provides an endpoint in case your token needs to be refreshed.
+
+The following endpoint will refresh the token
+
+```javascript
+refreshed_identity = auth.refresh_member_identity_token("mem_66c72702dfd9c9a34e80cae434a4bf7e6d3d37df", "google")
+
+print("Google refreshed access token is ", refreshed_identity.access_token)
+```
+
+The provider id can be either `google` or `gitlab` at this moment.
+
+This endpoint will return a `IdentityProviderData`.
+
+|| Note this endpoint currently works only with google and gitlab. Github does not provide any refresh token at this moment. If you need support for more providers feel free to reach out.
+
+
+#### Handling refresh errors
+
+Sometimes it's possible that the refresh token is revoked or expired. In that case PluginLab will not be able to refresh the token anymore.
+In that situation, PluginLab will return the following error with a HTTP CODE 422:
+
+```json
+{
+    "code": "refresh-token-failed",
+    "message": "The refresh token request has been rejected by the provider. It most likely means the refresh token is expired. Please ask your user to sign-in again using your auth-portal url."
+}
+```
+
+
+
 ## List members
 
 ### Basic
