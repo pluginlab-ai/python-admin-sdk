@@ -166,7 +166,7 @@ For OAuth providers such as Google or Gitlab the access token has a limited life
 
 The following endpoint will refresh the token
 
-```javascript
+```python
 refreshed_identity = auth.refresh_member_identity_token("mem_66c72702dfd9c9a34e80cae434a4bf7e6d3d37df", "google")
 
 print("Google refreshed access token is ", refreshed_identity.access_token)
